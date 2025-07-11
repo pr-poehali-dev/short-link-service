@@ -23,10 +23,31 @@ const Index = () => {
     if (!originalUrl) return;
 
     setIsLoading(true);
-    // Симуляция API запроса
+
+    // Генерируем короткий код
+    const shortCode = Math.random().toString(36).substring(2, 8);
+    const currentHost = window.location.origin;
+    const newShortUrl = `${currentHost}/${shortCode}`;
+
+    // Создаем объект ссылки
+    const linkData = {
+      id: Date.now().toString(),
+      originalUrl,
+      shortCode,
+      clicks: 0,
+      created: new Date().toLocaleDateString("ru-RU"),
+      expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 дней для анонимных
+    };
+
+    // Сохраняем в localStorage
+    const existingLinks = JSON.parse(
+      localStorage.getItem("shortLinks") || "[]",
+    );
+    existingLinks.push(linkData);
+    localStorage.setItem("shortLinks", JSON.stringify(existingLinks));
+
     setTimeout(() => {
-      const shortCode = Math.random().toString(36).substring(2, 8);
-      setShortUrl(`https://shrt.ly/${shortCode}`);
+      setShortUrl(newShortUrl);
       setStats({ clicks: 0, created: new Date().toLocaleDateString("ru-RU") });
       setIsLoading(false);
       toast({
